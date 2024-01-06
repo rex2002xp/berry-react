@@ -1,3 +1,130 @@
+import { forwardRef, ReactNode, ForwardedRef } from 'react';
+import { BoxProps } from '@mui/material/Box';
+import { Collapse, Fade, Box, Grow, Slide, Zoom } from '@mui/material';
+
+type Position = 'top-left' | 'top-right' | 'top' | 'bottom-left' | 'bottom-right' | 'bottom';
+type Direction = 'up' | 'down' | 'left' | 'right';
+type TransitionType = 'grow' | 'fade' | 'collapse' | 'slide' | 'zoom';
+
+interface TransitionsProps extends Omit<BoxProps, 'position'> {
+  children: ReactNode;
+  position: Position;
+  type: TransitionType;
+  direction: Direction;
+  in?: boolean;
+  timeout?: number | { enter?: number; exit?: number; appear?: number };
+  onEnter?: () => void;
+  onExited?: () => void;
+}
+
+export const Transitions = forwardRef((props: TransitionsProps, ref: ForwardedRef<never>) => {
+  const { children, position, type, direction, ...others } = props;
+
+  const transitionProps = {
+    in: others.in,
+    timeout: others.timeout,
+    onEnter: others.onEnter,
+    onExited: others.onExited,
+  };
+
+  let positionSX = {
+    transformOrigin: '0 0 0'
+  };
+
+  switch (position) {
+    case 'top-right':
+      positionSX = {
+        transformOrigin: 'top right'
+      };
+      break;
+    case 'top':
+      positionSX = {
+        transformOrigin: 'top'
+      };
+      break;
+    case 'bottom-left':
+      positionSX = {
+        transformOrigin: 'bottom left'
+      };
+      break;
+    case 'bottom-right':
+      positionSX = {
+        transformOrigin: 'bottom right'
+      };
+      break;
+    case 'bottom':
+      positionSX = {
+        transformOrigin: 'bottom'
+      };
+      break;
+    case 'top-left':
+    default:
+      positionSX = {
+        transformOrigin: '0 0 0'
+      };
+      break;
+  }
+
+  return (
+      <Box ref={ref}>
+        {type === 'grow' && (
+            <Grow {...transitionProps}>
+              <Box sx={positionSX}>{children}</Box>
+            </Grow>
+        )}
+        {type === 'collapse' && (
+            <Collapse {...transitionProps} sx={positionSX}>
+              {children}
+            </Collapse>
+        )}
+        {type === 'fade' && (
+            <Fade
+                {...transitionProps}
+                timeout={{
+                  appear: 500,
+                  enter: 600,
+                  exit: 400
+                }}
+            >
+              <Box sx={positionSX}>{children}</Box>
+            </Fade>
+        )}
+        {type === 'slide' && (
+            <Slide
+                {...transitionProps}
+                timeout={{
+                  appear: 0,
+                  enter: 400,
+                  exit: 200
+                }}
+                direction={direction}
+            >
+              <Box sx={positionSX}>{children}</Box>
+            </Slide>
+        )}
+        {type === 'zoom' && (
+            <Zoom {...transitionProps}>
+              <Box sx={positionSX}>{children}</Box>
+            </Zoom>
+        )}
+      </Box>
+  );
+});
+
+Transitions.defaultProps = {
+  type: 'grow',
+  position: 'top-left',
+  direction: 'up'
+};
+
+export default Transitions;
+
+
+
+
+
+/*
+
 import PropTypes from 'prop-types';
 import { forwardRef } from 'react';
 
@@ -105,3 +232,4 @@ Transitions.defaultProps = {
 };
 
 export default Transitions;
+*/
